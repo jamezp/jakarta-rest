@@ -59,6 +59,18 @@ final class FactoryFinder {
         });
     }
 
+    private static <T> Iterator<T> load(final Class<T> service, final ClassLoader classLoader) {
+        if (System.getSecurityManager() == null) {
+            return ServiceLoader.load(service, classLoader).iterator();
+        }
+        return AccessController.doPrivileged(new PrivilegedAction<Iterator<T>>() {
+            @Override
+            public Iterator<T> run() {
+                return ServiceLoader.load(service, classLoader).iterator();
+            }
+        });
+    }
+
     /**
      * Creates an instance of the specified class using the specified {@code ClassLoader} object.
      *
@@ -112,7 +124,7 @@ final class FactoryFinder {
         ClassLoader classLoader = getContextClassLoader();
 
         try {
-            Iterator<T> iterator = ServiceLoader.load(service, FactoryFinder.getContextClassLoader()).iterator();
+            Iterator<T> iterator = load(service, FactoryFinder.getContextClassLoader());
 
             if (iterator.hasNext()) {
                 return iterator.next();
@@ -122,7 +134,7 @@ final class FactoryFinder {
         }
 
         try {
-            Iterator<T> iterator = ServiceLoader.load(service, FactoryFinder.class.getClassLoader()).iterator();
+            Iterator<T> iterator = load(service, FactoryFinder.class.getClassLoader());
 
             if (iterator.hasNext()) {
                 return iterator.next();
