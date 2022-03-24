@@ -1906,13 +1906,29 @@ public class JAXRSClientIT extends JAXRSCommonClient {
   }
 
   protected void checkFutureOkResponse(Future<Response> future) throws Fault {
-    assertTrue(!future.isDone(), "Future cannot be done, yet!");
+    assertTrue(!future.isDone(),  () -> {
+      Response value = null;
+      try {
+        value = future.get();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+      return "Future cannot be done, yet! Value: " + value.getStatus() + ": " + value.readEntity(String.class);
+    });
     checkFutureResponseStatus(future, Status.OK);
   }
 
   protected void checkFutureString(Future<String> future, String expectedValue)
       throws Fault {
-    assertTrue(!future.isDone(), "Future cannot be done, yet!");
+    assertTrue(!future.isDone(), () -> {
+      String value = null;
+      try {
+        value = future.get();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+      return "Future cannot be done, yet! Value: " + value;
+    });
     String value = null;
     try {
       value = future.get();
