@@ -22,6 +22,9 @@ module jakarta.ws.rs {
     requires static jakarta.xml.bind;
 
     requires java.logging;
+    requires jakarta.cdi;
+    // TODO (jrp) do we need this, it's transitive in the current CDI spec
+    requires jakarta.inject;
 
     exports jakarta.ws.rs;
     exports jakarta.ws.rs.client;
